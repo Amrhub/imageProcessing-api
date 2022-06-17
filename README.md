@@ -18,8 +18,8 @@ Node.js and npm
 ### Setup
 
 ```bash
-git clone <repo-url>
-cd <project-name>
+git clone https://github.com/Amrhub/imageProcessing-api.git
+cd imageProcessing-api
 npm install
 ```
 
