@@ -1,52 +1,35 @@
 import express from 'express';
-import sharp from 'sharp';
-import { promises as fs } from 'fs';
+import fsSync, { promises as fs } from 'fs';
+import { validateQueryInputs, QueryInputs } from './utilities/helpers';
+import { imageProcessing } from './utilities/imageProcessing';
 export const app = express();
 const port = 3000;
 
-interface ValidateQueryInputs {
-  name?: string;
-  height?: string;
-  width?: string;
-}
+
 
 app.get('/', (_req, res) => {
   res.send('Welcome to Image processing api current version v1.0.0');
 });
 
+
+
 app.get('/image_processing', async (req, res) => {
-  const { width, height, name } = req.query;
-  const validateQueryInputs: ValidateQueryInputs = {};
-  let isQueryInputsValid = true;
-  if (!name) {
-    isQueryInputsValid = false;
-    validateQueryInputs.name = "is required with it's extension e.g 'image.jpg'";
-  }
+  const { width, height, name }: QueryInputs = req.query;
 
-  if (!(parseInt(height as string) > 0)) {
-    isQueryInputsValid = false;
-    validateQueryInputs.height = 'must be bigger than zero e.g 500';
-  }
-
-  if (!(parseInt(width as string) > 0)) {
-    isQueryInputsValid = false;
-    validateQueryInputs.width = 'must be bigger than zero e.g 500';
-  }
-
+  const { isQueryInputsValid, queryInputsValidationMsg } = validateQueryInputs({ width, height, name });
   if (!isQueryInputsValid) {
-    res.status(422).send(JSON.stringify({ image: validateQueryInputs }));
+    res.status(422).send(JSON.stringify({ image: queryInputsValidationMsg }));
     return;
   }
   try {
-    const outputImage = await fs.readFile(`./src/thumbnails/${name as string}`);
+    const outputImage = await fs.readFile(`./src/thumbnails/${name}`);
 
     res.contentType(`image/jpg`);
     res.send(outputImage);
   } catch {
     try {
-      await sharp(`./src/images/${name}`)
-        .resize(parseInt(width as string), parseInt(height as string))
-        .toFile(`./src/thumbnails/${name}`);
+      if (!fsSync.existsSync(`./src/images/${name}`)) throw new Error("Input file is missing: ./src/images/AmrAhmed.jpg")
+      imageProcessing(name as string, parseInt(width as string), parseInt(height as string))
 
       const outputImage = await fs.readFile(`./src/thumbnails/${name}`);
 

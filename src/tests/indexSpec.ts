@@ -50,18 +50,6 @@ describe('testing endpoints', () => {
       .get(`/image_processing?name=${imageForTestingName}&width=400&height=400`)
       .expect(200)
       .expect('Content-Type', 'image/jpg')
-      .end((err) => {
-        if (err) {
-          done.fail(err);
-        } else {
-          try {
-            const processedImage = fs.readFile(`./src/thumbnails/${imageForTestingName}`);
-            if (!processedImage) throw new Error('Image was not saved');
-            done();
-          } catch (err) {
-            done.fail(err as Error);
-          }
-        }
-      });
+      .end((err) => err ? done.fail(err) : done());
   });
 });

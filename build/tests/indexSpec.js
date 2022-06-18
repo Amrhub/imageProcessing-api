@@ -50,21 +50,6 @@ describe('testing endpoints', function () {
             .get("/image_processing?name=".concat(imageForTestingName, "&width=400&height=400"))
             .expect(200)
             .expect('Content-Type', 'image/jpg')
-            .end(function (err) {
-            if (err) {
-                done.fail(err);
-            }
-            else {
-                try {
-                    var processedImage = fs_1.promises.readFile("./src/thumbnails/".concat(imageForTestingName));
-                    if (!processedImage)
-                        throw new Error('Image was not saved');
-                    done();
-                }
-                catch (err) {
-                    done.fail(err);
-                }
-            }
-        });
+            .end(function (err) { return err ? done.fail(err) : done(); });
     });
 });

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -41,73 +64,59 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 var express_1 = __importDefault(require("express"));
-var sharp_1 = __importDefault(require("sharp"));
-var fs_1 = require("fs");
+var fs_1 = __importStar(require("fs"));
+var helpers_1 = require("./utilities/helpers");
+var imageProcessing_1 = require("./utilities/imageProcessing");
 exports.app = (0, express_1.default)();
 var port = 3000;
 exports.app.get('/', function (_req, res) {
     res.send('Welcome to Image processing api current version v1.0.0');
 });
 exports.app.get('/image_processing', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, width, height, name, validateQueryInputs, isQueryInputsValid, outputImage, _b, outputImage, err_1;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
+    var _a, width, height, name, _b, isQueryInputsValid, queryInputsValidationMsg, outputImage, _c, outputImage, err_1;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
             case 0:
                 _a = req.query, width = _a.width, height = _a.height, name = _a.name;
-                validateQueryInputs = {};
-                isQueryInputsValid = true;
-                if (!name) {
-                    isQueryInputsValid = false;
-                    validateQueryInputs.name = "is required with it's extension e.g 'image.jpg'";
-                }
-                if (!(parseInt(height) > 0)) {
-                    isQueryInputsValid = false;
-                    validateQueryInputs.height = 'must be bigger than zero e.g 500';
-                }
-                if (!(parseInt(width) > 0)) {
-                    isQueryInputsValid = false;
-                    validateQueryInputs.width = 'must be bigger than zero e.g 500';
-                }
+                _b = (0, helpers_1.validateQueryInputs)({ width: width, height: height, name: name }), isQueryInputsValid = _b.isQueryInputsValid, queryInputsValidationMsg = _b.queryInputsValidationMsg;
                 if (!isQueryInputsValid) {
-                    res.status(422).send(JSON.stringify({ image: validateQueryInputs }));
+                    res.status(422).send(JSON.stringify({ image: queryInputsValidationMsg }));
                     return [2 /*return*/];
                 }
-                _c.label = 1;
+                _d.label = 1;
             case 1:
-                _c.trys.push([1, 3, , 9]);
+                _d.trys.push([1, 3, , 8]);
                 return [4 /*yield*/, fs_1.promises.readFile("./src/thumbnails/".concat(name))];
             case 2:
-                outputImage = _c.sent();
-                res.contentType("image/jpg");
-                res.send(outputImage);
-                return [3 /*break*/, 9];
-            case 3:
-                _b = _c.sent();
-                _c.label = 4;
-            case 4:
-                _c.trys.push([4, 7, , 8]);
-                return [4 /*yield*/, (0, sharp_1.default)("./src/images/".concat(name))
-                        .resize(parseInt(width), parseInt(height))
-                        .toFile("./src/thumbnails/".concat(name))];
-            case 5:
-                _c.sent();
-                return [4 /*yield*/, fs_1.promises.readFile("./src/thumbnails/".concat(name))];
-            case 6:
-                outputImage = _c.sent();
+                outputImage = _d.sent();
                 res.contentType("image/jpg");
                 res.send(outputImage);
                 return [3 /*break*/, 8];
-            case 7:
-                err_1 = _c.sent();
+            case 3:
+                _c = _d.sent();
+                _d.label = 4;
+            case 4:
+                _d.trys.push([4, 6, , 7]);
+                if (!fs_1.default.existsSync("./src/images/".concat(name)))
+                    throw new Error("Input file is missing: ./src/images/AmrAhmed.jpg");
+                (0, imageProcessing_1.imageProcessing)(name, parseInt(width), parseInt(height));
+                return [4 /*yield*/, fs_1.promises.readFile("./src/thumbnails/".concat(name))];
+            case 5:
+                outputImage = _d.sent();
+                res.contentType("image/jpg");
+                res.send(outputImage);
+                return [3 /*break*/, 7];
+            case 6:
+                err_1 = _d.sent();
                 if (err_1 instanceof Error && err_1.message.includes('missing')) {
                     // assuming there are errors might occur from sharp not able to resize for example so I just want to give user accurate and user friendly message
                     res.status(404).send("Image ".concat(name, " not found"));
                     return [2 /*return*/];
                 }
                 console.error(err_1);
-                return [3 /*break*/, 8];
-            case 8: return [3 /*break*/, 9];
-            case 9: return [2 /*return*/];
+                return [3 /*break*/, 7];
+            case 7: return [3 /*break*/, 8];
+            case 8: return [2 /*return*/];
         }
     });
 }); });
