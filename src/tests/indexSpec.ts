@@ -22,6 +22,14 @@ describe('testing endpoints', () => {
       .end((err) => (err ? done.fail(err) : done()));
   });
 
+  it('should return 200 & the saved image when entering proper query inputs', (done) => {
+    request
+      .get(`/image_processing?name=${imageForTestingName}&width=400&height=400`)
+      .expect(200)
+      .expect('Content-Type', 'image/jpg')
+      .end((err) => err ? done.fail(err) : done());
+  }, 5000);
+
   it("should return 404 when passing name that doesn't exist and return right response", (done) => {
     const expectedResMsg = `Image ${imageNotExistName} not found`;
     request
@@ -38,18 +46,5 @@ describe('testing endpoints', () => {
           }
         }
       });
-  });
-
-  afterAll(() => {
-    fs.unlink(`./src/thumbnails/${imageForTestingName}`);
-    console.log('Removed test image from thumbnails folder.');
-  });
-
-  it('should return 200 & the saved image when entering proper query inputs', (done) => {
-    request
-      .get(`/image_processing?name=${imageForTestingName}&width=400&height=400`)
-      .expect(200)
-      .expect('Content-Type', 'image/jpg')
-      .end((err) => err ? done.fail(err) : done());
   });
 });

@@ -2,9 +2,9 @@ import express from 'express';
 import fsSync, { promises as fs } from 'fs';
 import { validateQueryInputs, QueryInputs } from './utilities/helpers';
 import { imageProcessing } from './utilities/imageProcessing';
+
 export const app = express();
 const port = 3000;
-
 
 
 app.get('/', (_req, res) => {
@@ -29,7 +29,7 @@ app.get('/image_processing', async (req, res) => {
   } catch {
     try {
       if (!fsSync.existsSync(`./src/images/${name}`)) throw new Error("Input file is missing: ./src/images/AmrAhmed.jpg")
-      imageProcessing(name as string, parseInt(width as string), parseInt(height as string))
+      await imageProcessing(name as string, parseInt(width as string), parseInt(height as string))
 
       const outputImage = await fs.readFile(`./src/thumbnails/${name}`);
 
@@ -41,7 +41,6 @@ app.get('/image_processing', async (req, res) => {
         res.status(404).send(`Image ${name} not found`);
         return;
       }
-      console.error(err);
     }
   }
 });

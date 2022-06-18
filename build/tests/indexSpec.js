@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var supertest_1 = __importDefault(require("supertest"));
 var index_1 = require("../index");
-var fs_1 = require("fs");
 var request = (0, supertest_1.default)(index_1.app);
 var imageNotExistName = "doesn'tExist.jpg";
 var imageForTestingName = 'forTesting.jpg';
@@ -22,6 +21,13 @@ describe('testing endpoints', function () {
             .expect(422)
             .end(function (err) { return (err ? done.fail(err) : done()); });
     });
+    it('should return 200 & the saved image when entering proper query inputs', function (done) {
+        request
+            .get("/image_processing?name=".concat(imageForTestingName, "&width=400&height=400"))
+            .expect(200)
+            .expect('Content-Type', 'image/jpg')
+            .end(function (err) { return err ? done.fail(err) : done(); });
+    }, 5000);
     it("should return 404 when passing name that doesn't exist and return right response", function (done) {
         var expectedResMsg = "Image ".concat(imageNotExistName, " not found");
         request
@@ -40,16 +46,5 @@ describe('testing endpoints', function () {
                 }
             }
         });
-    });
-    afterAll(function () {
-        fs_1.promises.unlink("./src/thumbnails/".concat(imageForTestingName));
-        console.log('Removed test image from thumbnails folder.');
-    });
-    it('should return 200 & the saved image when entering proper query inputs', function (done) {
-        request
-            .get("/image_processing?name=".concat(imageForTestingName, "&width=400&height=400"))
-            .expect(200)
-            .expect('Content-Type', 'image/jpg')
-            .end(function (err) { return err ? done.fail(err) : done(); });
     });
 });

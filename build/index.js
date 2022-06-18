@@ -85,38 +85,39 @@ exports.app.get('/image_processing', function (req, res) { return __awaiter(void
                 }
                 _d.label = 1;
             case 1:
-                _d.trys.push([1, 3, , 8]);
+                _d.trys.push([1, 3, , 9]);
                 return [4 /*yield*/, fs_1.promises.readFile("./src/thumbnails/".concat(name))];
             case 2:
                 outputImage = _d.sent();
                 res.contentType("image/jpg");
                 res.send(outputImage);
-                return [3 /*break*/, 8];
+                return [3 /*break*/, 9];
             case 3:
                 _c = _d.sent();
                 _d.label = 4;
             case 4:
-                _d.trys.push([4, 6, , 7]);
+                _d.trys.push([4, 7, , 8]);
                 if (!fs_1.default.existsSync("./src/images/".concat(name)))
                     throw new Error("Input file is missing: ./src/images/AmrAhmed.jpg");
-                (0, imageProcessing_1.imageProcessing)(name, parseInt(width), parseInt(height));
-                return [4 /*yield*/, fs_1.promises.readFile("./src/thumbnails/".concat(name))];
+                return [4 /*yield*/, (0, imageProcessing_1.imageProcessing)(name, parseInt(width), parseInt(height))];
             case 5:
+                _d.sent();
+                return [4 /*yield*/, fs_1.promises.readFile("./src/thumbnails/".concat(name))];
+            case 6:
                 outputImage = _d.sent();
                 res.contentType("image/jpg");
                 res.send(outputImage);
-                return [3 /*break*/, 7];
-            case 6:
+                return [3 /*break*/, 8];
+            case 7:
                 err_1 = _d.sent();
                 if (err_1 instanceof Error && err_1.message.includes('missing')) {
                     // assuming there are errors might occur from sharp not able to resize for example so I just want to give user accurate and user friendly message
                     res.status(404).send("Image ".concat(name, " not found"));
                     return [2 /*return*/];
                 }
-                console.error(err_1);
-                return [3 /*break*/, 7];
-            case 7: return [3 /*break*/, 8];
-            case 8: return [2 /*return*/];
+                return [3 /*break*/, 8];
+            case 8: return [3 /*break*/, 9];
+            case 9: return [2 /*return*/];
         }
     });
 }); });
